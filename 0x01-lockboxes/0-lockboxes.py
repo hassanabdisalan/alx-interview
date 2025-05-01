@@ -1,13 +1,17 @@
 #!/usr/bin/python3
+"""
+0-lockboxes.py - Determines if all boxes can be unlocked.
+"""
+
 
 def canUnlockAll(boxes):
     """
     Determines if all the boxes can be opened.
-    
+
     Parameters:
     boxes (list of list of int): A list where each index represents a box and
                                  contains a list of keys found in that box.
-    
+
     Returns:
     bool: True if all boxes can be opened, False otherwise.
     """
@@ -15,15 +19,13 @@ def canUnlockAll(boxes):
         return False
 
     n = len(boxes)
-    visited = set()
-    stack = [0]  # Start with box 0
+    unlocked = set([0])
+    keys = set(boxes[0])
 
-    while stack:
-        box = stack.pop()
-        if box not in visited:
-            visited.add(box)
-            for key in boxes[box]:
-                if isinstance(key, int) and 0 <= key < n and key not in visited:
-                    stack.append(key)
+    while keys:
+        key = keys.pop()
+        if isinstance(key, int) and 0 <= key < n and key not in unlocked:
+            unlocked.add(key)
+            keys.update(boxes[key])
 
-    return len(visited) == n
+    return len(unlocked) == n
