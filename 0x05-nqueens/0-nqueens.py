@@ -11,8 +11,13 @@ def is_safe(queens, row, col):
     return True
 
 
-def solve_nqueens(n, row=0, queens=[], solutions=[]):
+def solve_nqueens(n, row=0, queens=None, solutions=None):
     """Backtracking solution to N-Queens"""
+    if queens is None:
+        queens = []
+    if solutions is None:
+        solutions = []
+
     if row == n:
         solutions.append(queens[:])
         return
