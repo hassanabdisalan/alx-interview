@@ -1,68 +1,92 @@
 #!/usr/bin/python3
 """
-N Queens problem solution using backtracking
+Solves the N-Queens puzzle, placing N non-attacking queens on an N×N chessboard.
+
+Usage: nqueens N
+  N must be an integer greater than or equal to 4.
+
+The program prints every possible solution, one per line,
+in the format: [[row, col], [row, col], ...]
 """
 
 import sys
 
 
-def is_safe(board, row, col, n):
+def is_safe(board, row, col):
     """
-    Check if it's safe to place a queen at board[row][col]
+    Checks if placing a queen at (row, col) is safe given the current
+    positions of queens on the board.
+
+    Args:
+        board (list): A list of lists, where each inner list [r, c]
+                      represents the position of a queen at row r and column c.
+        row (int): The current row to place a queen.
+        col (int): The current column to place a queen.
+
+    Returns:
+        bool: True if it's safe to place a queen, False otherwise.
     """
-    # Check this row on left side
-    for i in range(col):
-        if board[row][i] == 1:
+    # Check if there is a queen in the same column
+    for queen_row, queen_col in board:
+        if queen_col == col:
             return False
 
-    # Check upper diagonal on left side
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
+    # Check if there is a queen in the upper-left diagonal
+    # (row - col) constant
+    for queen_row, queen_col in board:
+        if queen_row - queen_col == row - col:
             return False
 
-    # Check lower diagonal on left side
-    for i, j in zip(range(row, n, 1), range(col, -1, -1)):
-        if board[i][j] == 1:
+    # Check if there is a queen in the upper-right diagonal
+    # (row + col) constant
+    for queen_row, queen_col in board:
+        if queen_row + queen_col == row + col:
             return False
 
     return True
 
 
-def solve_nqueens_util(board, col, n, solutions):
+def solve_n_queens(n):
     """
-    A recursive utility function to solve N Queens problem
-    """
-    # Base case: If all queens are placed
-    if col >= n:
-        solution = []
-        for i in range(n):
-            for j in range(n):
-                if board[i][j] == 1:
-                    solution.append([i, j])
-        solutions.append(solution)
-        return
+    Finds all possible solutions to the N-Queens problem using backtracking.
 
-    # Consider this column and try placing this queen in all rows one by one
-    for i in range(n):
-        if is_safe(board, i, col, n):
-            board[i][col] = 1
-            solve_nqueens_util(board, col + 1, n, solutions)
-            board[i][col] = 0  # backtrack
+    Args:
+        n (int): The size of the chessboard (N x N).
 
-
-def solve_nqueens(n):
+    Returns:
+        list: A list of solutions, where each solution is a list of
+              queen positions [[row, col], ...].
     """
-    Solves the N Queens problem and prints all solutions
-    """
-    board = [[0 for _ in range(n)] for _ in range(n)]
     solutions = []
-    solve_nqueens_util(board, 0, n, solutions)
+    # board will store the column index for each row where a queen is placed
+    # e.g., board[0] = 1 means a queen is at (0, 1)
+    current_board = []
+
+    def backtrack(row):
+        """
+        Recursive helper function to find queen placements.
+
+        Args:
+            row (int): The current row to place a queen.
+        """
+        if row == n:
+            # All queens are placed, add the current board configuration to solutions
+            solutions.append([list(pos) for pos in current_board])
+            return
+
+        for col in range(n):
+            if is_safe(current_board, row, col):
+                current_board.append([row, col])
+                backtrack(row + 1)
+                current_board.pop()  # Backtrack: remove the last placed queen
+
+    backtrack(0)  # Start placing queens from the first row (row 0)
     return solutions
 
 
 def main():
     """
-    Main function to handle command line arguments and print solutions
+    Main function to parse arguments, validate N, and print solutions.
     """
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
@@ -78,8 +102,8 @@ def main():
         print("N must be at least 4")
         sys.exit(1)
 
-    solutions = solve_nqueens(n)
-    for solution in solutions:
+    all_solutions = solve_n_queens(n)
+    for solution in all_solutions:
         print(solution)
 
 
